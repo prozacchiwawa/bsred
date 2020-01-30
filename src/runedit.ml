@@ -495,22 +495,24 @@ let createFrame spec =
   Render.new_frame spec.frameX spec.frameY
 
 let encodeRenderEvent cursors =
+  let _ = Js.log (Array.of_list (IntIntSet.elements cursors)) in
   function
   | Render.SetChar (x,y,c) ->
     let isCursor = IntIntSet.mem (x,y) cursors in
+    let _ = Js.log ("setChar " ^ (string_of_int x) ^ " " ^ (string_of_int y) ^ " " ^ (if isCursor then "cursor" else "notcursor")) in
     let fg =
-      if isCursor then Term.show_color c.cellStyle.bg else Term.show_color c.cellStyle.fg
+      if isCursor then Term.Black else c.cellStyle.fg
     in
     let bg =
-      if not isCursor then Term.show_color c.cellStyle.bg else Term.show_color c.cellStyle.fg
+      if isCursor then Term.Green else c.cellStyle.bg
     in
     Js.Json.object_
       (Js.Dict.fromList
          [ ("t", Js.Json.string "c")
          ; ("x", Js.Json.number (float_of_int x))
          ; ("y", Js.Json.number (float_of_int y))
-         ; ("bg", Js.Json.string bg)
-         ; ("fg", Js.Json.string fg)
+         ; ("bg", Js.Json.string (Term.show_color bg))
+         ; ("fg", Js.Json.string (Term.show_color fg))
          ; ("c", Js.Json.string c.cellChar)
          ]
       )
@@ -537,7 +539,7 @@ open State
 open File
 
 let getCursors editor =
-  let view = get_default_view editor in
+  let view = get_focused_view editor in
   let cursors = view.cursors in
   IntIntSet.of_list (List.map (fun c -> (c.position.x,c.position.y)) cursors)
 

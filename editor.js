@@ -150,6 +150,7 @@ function Editor(fme,edt) {
     });
     this.frameobj = edit.createFrame({ frameX: this.sizeX, frameY: this.sizeY });
     this.rows = [];
+    this.divs = [];
     this.attributes = [];
 
     this.editor.addEventListener('click', (evt) => {
@@ -184,10 +185,20 @@ Editor.prototype.refresh = function() {
     this.renderEvents(events);
 }
 
+function clearDiv(editor) {
+    while (editor.childNodes.length > 0) {
+        editor.removeChild(editor.childNodes[0]);
+    }
+
+}
+
 Editor.prototype.renderEvents = function(events) {
+    var touchedRows = {};
+
     for (var i = 0; i < events.length; i++) {
         var event = events[i];
         if (event.t == 'c') {
+            touchedRows[event.y] = true;
             if (!this.rows[event.y]) {
                 this.rows[event.y] = '';
             }
@@ -196,19 +207,67 @@ Editor.prototype.renderEvents = function(events) {
                 theString = theString + ' ';
             }
             this.rows[event.y] = replaceCharIn(theString, event.x, event.c);
-            this.attributes[event.y * this.sizeX + event.x] = [event.fg,event.bg];
+            this.attributes[event.y * this.sizeX + event.x] = {'fg': event.fg, 'bg': event.bg};
         }
     }
 
-    while (this.editor.childNodes.length > 0) {
-        this.editor.removeChild(this.editor.childNodes[0]);
+    var realizeDiv = (i) => {
+        if (!this.divs[i]) {
+            var div = document.createElement('div');
+            div.setAttribute('class','editor-row');
+            var seg = document.createElement('pre');
+            seg.setAttribute('class', 'editor-chunk bg-Default fg-Default');
+            seg.appendChild(document.createTextNode('~'));
+            div.appendChild(seg);
+            this.divs[i] = div;
+        }
+        return this.divs[i];
+    };
+
+    var realizeAttr = (idx) => {
+        if (!this.attributes[idx]) {
+            this.attributes[idx] = { bg:'Black', fg:'Grey' };
+        }
+        return this.attributes[idx];
+    };
+
+    var rows = Object.keys(touchedRows);
+    for (var r = 0; r < rows.length; r++) {
+        var i = parseInt(rows[r]);
+
+        var text = this.rows[i] === undefined ? '~' : this.rows[i];
+        var currentJ = 0;
+        var currentAttribute = {fg:'', bg:''};
+
+        var div = realizeDiv(i);
+        clearDiv(div);
+
+        var addSegment = (j,a) => {
+            var seg = document.createElement('pre');
+            seg.setAttribute('class','editor-chunk bg-' + currentAttribute.bg + ' fg-' + currentAttribute.fg);
+            seg.appendChild(document.createTextNode(text.substr(currentJ,j - currentJ)));
+            currentAttribute = a;
+            currentJ = j;
+            div.appendChild(seg);
+        };
+
+        for (var j = 0; j < text.length; j++) {
+            var idx = i * this.sizeX + j;
+            var attr = realizeAttr(idx);
+            if (attr.fg !== currentAttribute.fg || attr.bg !== currentAttribute.bg) {
+                addSegment(j,attr);
+            }
+        }
+
+        var j = text.length - 1;
+        if (j >= 0) {
+            addSegment(text.length, realizeAttr(i * this.sizeX + j));
+        }
     }
 
+    clearDiv(this.editor);
     for (var i = 0; i < this.sizeY; i++) {
-        var div = document.createElement('pre');
-        var text = this.rows[i] === undefined ? '~' : this.rows[i];
-        div.setAttribute('class','editor-row');
-        div.appendChild(document.createTextNode(text));
+        var div = realizeDiv(i);
         this.editor.appendChild(div);
     }
 }
