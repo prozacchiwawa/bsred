@@ -159,7 +159,7 @@ let on_key_press state (key: Key.t) =
                 | Control ->
                     Log.info "Unbound key: %s" (Key.show key)
 
-let render state frame =
+let render state frame : unit =
   let w = Render.width frame in
   let h = Render.height frame in
   Layout.render
