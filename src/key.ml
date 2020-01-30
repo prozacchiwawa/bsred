@@ -1522,9 +1522,9 @@ let symbol key =
     | Letter_y -> ASCII 'y'
     | Letter_z -> ASCII 'z'
 
-    | Left_brace -> ASCII '['
+    | Left_brace -> ASCII '{'
     | Pipe -> ASCII '|'
-    | Right_brace -> ASCII ']'
+    | Right_brace -> ASCII '}'
     | Tilde -> ASCII '~'
 
     | Unicode s -> Unicode s

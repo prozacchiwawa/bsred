@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>Editor test</title>
+        <style>
+         .editor-container {
+             background-color: black;
+             width: 80rem;
+             height: 24rem;
+             display: flex;
+             flex-direction: column;
+             position: relative;
+             color: white;
+             font-family: monospace;
+         }
+
+         .editor-row {
+             height: 1rem;
+         }
+
+         .input-container-1px {
+             width: 0px;
+             height: 0px;
+             position: relative;
+         }
+        </style>
+    </head>
+    <body>
+        <div class='input-container-1px'><input id='focusme'/></div>
+        <div id='editor' class='editor-container'>
+        </div>
+    </body>
+    <script src='./bsred.js'> </script>
+</html>
