@@ -215,19 +215,29 @@ function clearDiv(editor) {
 Editor.prototype.renderEvents = function(events) {
     var touchedRows = {};
 
+    var acceptChar = (event) => {
+        touchedRows[event.y] = true;
+        if (!this.rows[event.y]) {
+            this.rows[event.y] = '';
+        }
+        var theString = this.rows[event.y];
+        while (event.x > theString.length) {
+            theString = theString + ' ';
+        }
+        this.rows[event.y] = replaceCharIn(theString, event.x, event.c);
+        this.attributes[event.y * this.sizeX + event.x] = {'fg': event.fg, 'bg': event.bg};
+    };
+
     for (var i = 0; i < events.length; i++) {
         var event = events[i];
         if (event.t == 'c') {
-            touchedRows[event.y] = true;
-            if (!this.rows[event.y]) {
-                this.rows[event.y] = '';
+            acceptChar(event);
+        } else if (event.t == 'm') {
+            for (var j = 0; j < event.width; j++) {
+                event.c = j < event.value.length ? event.value.charAt(j) : ' ';
+                acceptChar(event);
+                event.x++;
             }
-            var theString = this.rows[event.y];
-            while (event.x > theString.length) {
-                theString = theString + ' ';
-            }
-            this.rows[event.y] = replaceCharIn(theString, event.x, event.c);
-            this.attributes[event.y * this.sizeX + event.x] = {'fg': event.fg, 'bg': event.bg};
         }
     }
 
