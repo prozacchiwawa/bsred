@@ -153,6 +153,13 @@ function Editor(fme,edt) {
     this.divs = [];
     this.attributes = [];
 
+    for (var i = 0; i < this.sizeY; i++) {
+        var div = this.realizeDiv(i);
+        if (div.parentNode != this.editor) {
+            this.editor.appendChild(div);
+        }
+    }
+
     this.editor.addEventListener('click', (evt) => {
         console.log('focus');
         this.focusme.focus();
@@ -174,6 +181,19 @@ function Editor(fme,edt) {
         });
         this.renderEvents(events);
     });
+};
+
+Editor.prototype.realizeDiv = function(i) {
+    if (!this.divs[i]) {
+        var div = document.createElement('div');
+        div.setAttribute('class','editor-row');
+        var seg = document.createElement('pre');
+        seg.setAttribute('class', 'editor-chunk bg-Default fg-Default');
+        seg.appendChild(document.createTextNode('~'));
+        div.appendChild(seg);
+        this.divs[i] = div;
+    }
+    return this.divs[i];
 };
 
 Editor.prototype.refresh = function() {
@@ -211,19 +231,6 @@ Editor.prototype.renderEvents = function(events) {
         }
     }
 
-    var realizeDiv = (i) => {
-        if (!this.divs[i]) {
-            var div = document.createElement('div');
-            div.setAttribute('class','editor-row');
-            var seg = document.createElement('pre');
-            seg.setAttribute('class', 'editor-chunk bg-Default fg-Default');
-            seg.appendChild(document.createTextNode('~'));
-            div.appendChild(seg);
-            this.divs[i] = div;
-        }
-        return this.divs[i];
-    };
-
     var realizeAttr = (idx) => {
         if (!this.attributes[idx]) {
             this.attributes[idx] = { bg:'Black', fg:'Grey' };
@@ -239,7 +246,7 @@ Editor.prototype.renderEvents = function(events) {
         var currentJ = 0;
         var currentAttribute = {fg:'', bg:''};
 
-        var div = realizeDiv(i);
+        var div = this.realizeDiv(i);
         clearDiv(div);
 
         var addSegment = (j,a) => {
@@ -263,12 +270,6 @@ Editor.prototype.renderEvents = function(events) {
         if (j >= 0) {
             addSegment(text.length, realizeAttr(i * this.sizeX + j));
         }
-    }
-
-    clearDiv(this.editor);
-    for (var i = 0; i < this.sizeY; i++) {
-        var div = realizeDiv(i);
-        this.editor.appendChild(div);
     }
 }
 
