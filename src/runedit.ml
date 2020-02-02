@@ -495,11 +495,9 @@ let createFrame spec =
   Render.new_frame spec.frameX spec.frameY
 
 let encodeRenderEvent cursors =
-  let _ = Js.log (Array.of_list (IntIntSet.elements cursors)) in
   function
   | Render.SetChar (x,y,c) ->
     let isCursor = IntIntSet.mem (x,y) cursors in
-    let _ = Js.log ("setChar " ^ (string_of_int x) ^ " " ^ (string_of_int y) ^ " " ^ (if isCursor then "cursor" else "notcursor")) in
     let fg =
       if isCursor then Term.Black else c.cellStyle.fg
     in

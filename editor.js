@@ -99,10 +99,18 @@ function mapKey(evt) {
         s = 'digit_' + evt.key;
     } else if (evt.key.length == 1 && evt.key.charCodeAt(0) >= 65 && evt.key.charCodeAt(0) < 65 + 26) {
         shift = false;
-        s = 'letter_' + evt.key;
+        if (ctrl || alt) {
+            s = evt.key;
+        } else {
+            s = 'letter_' + evt.key.toLowerCase();
+        }
     } else if (evt.key.length == 1 && evt.key.charCodeAt(0) >= 97 && evt.key.charCodeAt(0) < 97 + 26) {
         shift = false;
-        s = 'letter_' + evt.key;
+        if (ctrl || alt) {
+            s = evt.key;
+        } else {
+            s = 'letter_' + evt.key.toLowerCase();
+        }
     } else if (keymap['code_'+evt.keyCode]) {
         s = keymap['code_'+evt.keyCode];
     } else if (evt.keyCode >= 112 && evt.keyCode < 112 + 12) {
@@ -131,8 +139,6 @@ function mapKey(evt) {
         s = s.charAt(0).toUpperCase() + s.substr(1);
     }
 
-    console.log('evt ' + evt.key + ' -> ' + s + ' was ' + prefix);
-
     return s;
 };
 
@@ -146,7 +152,7 @@ function Editor(fme,edt) {
     this.focusme = document.getElementById(fme);
     this.editor = document.getElementById(edt);
     this.editobj = edit.createEditor({
-        filename: 'hi.txt', filedata: '(* Foo fun *)\nlet x = 3'
+        filename: 'hi.ml', filedata: '(* Foo fun *)\nlet x = 3'
     });
     this.frameobj = edit.createFrame({ frameX: this.sizeX, frameY: this.sizeY });
     this.rows = [];
@@ -161,14 +167,7 @@ function Editor(fme,edt) {
     }
 
     this.editor.addEventListener('click', (evt) => {
-        console.log('focus');
         this.focusme.focus();
-    });
-    this.focusme.addEventListener('focus', (evt) => {
-        console.log('focused');
-    });
-    this.focusme.addEventListener('blur', (evt) => {
-        console.log('blurred');
     });
 
     this.focusme.addEventListener('keydown', (evt) => {
@@ -209,7 +208,6 @@ function clearDiv(editor) {
     while (editor.childNodes.length > 0) {
         editor.removeChild(editor.childNodes[0]);
     }
-
 }
 
 Editor.prototype.renderEvents = function(events) {
@@ -283,5 +281,14 @@ Editor.prototype.renderEvents = function(events) {
     }
 }
 
-var editor = new Editor('focusme','editor');
-editor.refresh();
+if (window) {
+    window.Editor = Editor;
+}
+
+if (module.exports) {
+    module.exports.Editor = Editor;
+    module.exports.createEditor = edit.createEditor;
+    module.exports.createFrame = edit.createFrame;
+    module.exports.acceptKeyEvent = edit.acceptKeyEvent;
+    module.exports.rerender = edit.rerender;
+}
