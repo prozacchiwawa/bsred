@@ -559,3 +559,10 @@ let acceptKeyEvent spec =
     State.on_key_press spec.acceptEditor k ;
     rerender spec
   | None -> [| |]
+
+type saveResult = { result : string ; found : bool }
+
+let to_string spec =
+  match List.filter (fun (f : File.t) -> f.name = spec.acceptKey) spec.acceptEditor.files with
+  | [f] -> { result = Text.to_string f.text ; found = true }
+  | _ -> { result = "" ; found = false }

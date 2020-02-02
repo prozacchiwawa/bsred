@@ -291,4 +291,5 @@ if (module.exports) {
     module.exports.createFrame = edit.createFrame;
     module.exports.acceptKeyEvent = edit.acceptKeyEvent;
     module.exports.rerender = edit.rerender;
+    module.exports.to_string = edit.to_string;
 }
