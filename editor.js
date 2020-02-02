@@ -102,7 +102,7 @@ function mapKey(evt) {
         if (ctrl || alt) {
             s = evt.key;
         } else {
-            s = 'letter_' + evt.key.toLowerCase();
+            s = 'letter_' + evt.key.toUpperCase();
         }
     } else if (evt.key.length == 1 && evt.key.charCodeAt(0) >= 97 && evt.key.charCodeAt(0) < 97 + 26) {
         shift = false;
