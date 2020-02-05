@@ -542,6 +542,9 @@ let getCursors editor =
   IntIntSet.of_list (List.map (fun c -> (c.position.x,c.position.y)) cursors)
 
 let rerender spec =
+  let view = get_focused_view spec.acceptEditor in
+  view.width <- Render.width spec.acceptFrame ;
+  view.height <- Render.height spec.acceptFrame ;
   let cursors = getCursors spec.acceptEditor in
   State.render spec.acceptEditor spec.acceptFrame ;
   Array.map (encodeRenderEvent cursors) (Render.render spec.acceptFrame)

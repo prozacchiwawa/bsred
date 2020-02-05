@@ -84,7 +84,9 @@ var cancelShift = {
     'left_brace': true,
     'leff_bracket': true,
     'right_brace': true,
-    'right_bracket': true
+    'right_bracket': true,
+    'quote': true,
+    'arobase': true
 };
 
 function mapKey(evt) {
