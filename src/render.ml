@@ -45,7 +45,18 @@ let set frame x y cell =
     let _ = frame.diffs := IntSet.add idx !(frame.diffs) in
     ()
 let text ?(style = Style.default) frame x y w str =
+  let l = String.length str in
+  for i = 0 to min (x + (w - 1)) (frame.planeWidth - x - 1) do
+    let ch =
+      if i < l then
+        String.sub str i 1
+      else
+        " "
+    in
+    set frame (x + i) y { cellStyle = style ; cellChar = ch }
+  done ;
   frame.texts := { value = str ; msgX = x ; msgY = y ; msgWidth = w ; style = style } :: !(frame.texts)
+
 let width frame = frame.planeWidth
 let height frame = frame.planeHeight
 let new_frame x y =
